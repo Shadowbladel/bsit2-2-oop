@@ -1,4 +1,12 @@
-package PACKAGE_NAME;
+public class InsufficientFundsException extends Exception {
+    private final double shortfall;
 
-public class InsufficientFundsException {
+    public InsufficientFundsException(String message, double shortfall) {
+        super(message);
+        this.shortfall = shortfall;
+    }
+
+    public double getShortfall() {
+        return shortfall;
+    }
 }
