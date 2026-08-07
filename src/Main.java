@@ -1,208 +1,87 @@
+import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int maxStudents = 10;
+        ArrayList<Vehicle> vehicles = new ArrayList<>();
+        Scanner input = new Scanner(System.in);
+        int choice = 0;
 
-        int[] studentIds = new int[maxStudents];
-        String[] fullNames = new String[maxStudents];
-        int[] ages = new int[maxStudents];
-        String[] courses = new String[maxStudents];
-        double[] grades = new double[maxStudents];
-        boolean[] enrolledStatuses = new boolean[maxStudents];
+        while (choice != 5) {
+            try {
+                System.out.println();
+                System.out.println("===== VEHICLE MANAGER =====");
+                System.out.println("1 - Add Car");
+                System.out.println("2 - Add Motorcycle");
+                System.out.println("3 - Remove a Vehicle");
+                System.out.println("4 - Display All Vehicles");
+                System.out.println("5 - Exit");
+                System.out.print("Choose an option: ");
 
-        int studentCount = 0;
-        boolean exit = false;
+                choice = input.nextInt();
+                input.nextLine();
 
-        // --- MAIN PROGRAM LOOP ---
-        while (!exit) {
-            System.out.println("========================================");
-            System.out.println("       STUDENT INFORMATION SYSTEM       ");
-            System.out.println("========================================");
-            System.out.println("[1] Add Student");
-            System.out.println("[2] View All Students");
-            System.out.println("[3] Search Student by ID");
-            System.out.println("[4] View Statistics");
-            System.out.println("[5] Exit");
-            System.out.print("Enter choice: ");
+                if (choice == 1) {
+                    System.out.print("Brand: ");
+                    String brand = input.nextLine();
+                    System.out.print("Year: ");
+                    int year = input.nextInt();
+                    System.out.print("Number of doors: ");
+                    int doors = input.nextInt();
 
-            // Validate menu selection input
-            if (!scanner.hasNextInt()) {
-                System.out.println("\n[Error] Invalid input. Please enter a number.\n");
-                scanner.nextLine();
-                continue;
-            }
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-            System.out.println();
+                    vehicles.add(new Car(brand, year, doors));
+                    System.out.println(">> Car added!");
+                }
+                else if (choice == 2) {
+                    System.out.print("Brand: ");
+                    String brand = input.nextLine();
+                    System.out.print("Year: ");
+                    int year = input.nextInt();
+                    System.out.print("Has sidecar? (true/false): ");
+                    boolean sidecar = input.nextBoolean();
 
-            switch (choice) {
-                case 1: // --- ADD STUDENT ---
-                    if (studentCount >= maxStudents) {
-                        System.out.println("[Error] Cannot add more students. Maximum capacity reached.\n");
-                        break;
-                    }
 
-                    System.out.println("--- ADD NEW STUDENT ---");
+                    vehicles.add(new Motorcycle(brand, year, sidecar));
+                    System.out.println(">> Motorcycle added!");
+                }
+                else if (choice == 3) {
+                    System.out.print("Enter the number to remove: ");
+                    int number = input.nextInt();
 
-                    // 1. Student ID Validation
-                    System.out.print("Enter Student ID: ");
-                    while (!scanner.hasNextInt()) {
-                        System.out.println("[Error] Invalid input. Please enter an integer.");
-                        System.out.print("Enter Student ID: ");
-                        scanner.next();
-                    }
-                    studentIds[studentCount] = scanner.nextInt();
-                    scanner.nextLine();
 
-                    // 2. Full Name Input
-                    System.out.print("Enter Full Name: ");
-                    fullNames[studentCount] = scanner.nextLine();
-
-                    // 3. Age Validation
-                    int age;
-                    do {
-                        System.out.print("Enter Age: ");
-                        while (!scanner.hasNextInt()) {
-                            System.out.println("[Error] Invalid input. Please enter an integer.");
-                            System.out.print("Enter Age: ");
-                            scanner.next();
-                        }
-                        age = scanner.nextInt();
-                        if (age <= 0) {
-                            System.out.println("[Error] Invalid age. Must be a positive number.");
-                        }
-                    } while (age <= 0);
-                    ages[studentCount] = age;
-                    scanner.nextLine();
-
-                    // 4. Course Input
-                    System.out.print("Enter Course: ");
-                    courses[studentCount] = scanner.nextLine();
-
-                    // 5. Grade Validation
-                    double grade;
-                    do {
-                        System.out.print("Enter Grade (0-100): ");
-                        while (!scanner.hasNextDouble()) {
-                            System.out.println("[Error] Invalid input. Please enter a number.");
-                            System.out.print("Enter Grade (0-100): ");
-                            scanner.next();
-                        }
-                        grade = scanner.nextDouble();
-                        if (grade < 0 || grade > 100) {
-                            System.out.println("[Error] Invalid grade. Must be between 0 and 100.");
-                        }
-                    } while (grade < 0 || grade > 100);
-                    grades[studentCount] = grade;
-
-                    // 6. Enrollment Status Validation
-                    System.out.print("Is Enrolled? (true/false): ");
-                    while (!scanner.hasNextBoolean()) {
-                        System.out.println("Invalid input. Please enter 'true' or 'false'.");
-                        System.out.print("Is Enrolled? (true/false): ");
-                        scanner.next();
-                    }
-                    enrolledStatuses[studentCount] = scanner.nextBoolean();
-
-                    System.out.println("\n>> Student added successfully!\n");
-                    studentCount++;
-                    break;
-
-                case 2: // --- VIEW ALL STUDENTS ---
-                    System.out.println("-------------------------------- STUDENT RECORDS --------------------------------");
-                    if (studentCount == 0) {
-                        System.out.println("No student records found.");
+                    if (number >= 1 && number <= vehicles.size()) {
+                        vehicles.remove(number - 1);
+                        System.out.println(">> Removed!");
                     } else {
-                        System.out.printf("%-6s %-18s %-5s %-10s %-8s %-15s\n",
-                                "ID", "NAME", "AGE", "COURSE", "GRADE", "STANDING");
-                        System.out.println("---------------------------------------------------------------------------------");
-
-                        for (int i = 0; i < studentCount; i++) {
-                            String standing;
-                            if (grades[i] >= 90) {
-                                standing = "Dean's Lister";
-                            } else if (grades[i] >= 75) {
-                                standing = "Passed";
-                            } else {
-                                standing = "Failed";
-                            }
-
-                            System.out.printf("%-6d %-18s %-5d %-10s %-8.1f %-15s\n",
-                                    studentIds[i], fullNames[i], ages[i], courses[i], grades[i], standing);
-                        }
+                        System.out.println(">> Invalid number.");
                     }
-                    System.out.println();
-                    break;
-
-                case 3: // --- SEARCH STUDENT BY ID ---
-                    System.out.print("Enter Student ID to search: ");
-                    while (!scanner.hasNextInt()) {
-                        System.out.println("Invalid input. Please enter an integer.");
-                        System.out.print("Enter Student ID to search: ");
-                        scanner.next();
-                    }
-                    int searchId = scanner.nextInt();
-                    boolean found = false;
-
-                    for (int i = 0; i < studentCount; i++) {
-                        if (studentIds[i] == searchId) {
-                            System.out.println("\n--- STUDENT FOUND ---");
-                            System.out.println("ID Number : " + studentIds[i]);
-                            System.out.println("Name      : " + fullNames[i]);
-                            System.out.println("Age       : " + ages[i]);
-                            System.out.println("Course    : " + courses[i]);
-                            System.out.println("Grade     : " + grades[i]);
-                            System.out.println("Enrolled  : " + (enrolledStatuses[i] ? "Yes" : "No"));
-                            found = true;
-                            break;
-                        }
+                }
+                else if (choice == 4) {
+                    System.out.println("--- All Vehicles ---");
+                    if (vehicles.isEmpty()) {
+                        System.out.println("(none yet)");
                     }
 
-                    if (!found) {
-                        System.out.println("\n[Notice] Student with ID " + searchId + " was not found.");
+
+                    for (int i = 0; i < vehicles.size(); i++) {
+                        System.out.print((i + 1) + ". ");
+                        vehicles.get(i).displayInfo();
                     }
-                    System.out.println();
-                    break;
+                }
+                else if (choice != 5) {
+                    System.out.println(">> Invalid choice. Please select 1-5.");
+                }
 
-                case 4: // --- VIEW STATISTICS ---
-                    System.out.println("--- PROGRAM STATISTICS ---");
-                    System.out.println("Total Students : " + studentCount);
+            } catch (InputMismatchException e) {
 
-                    if (studentCount > 0) {
-                        double total = 0;
-                        double highestGrade = -1;
-                        String topStudentName = "";
-
-                        for (int i = 0; i < studentCount; i++) {
-                            total += grades[i];
-                            if (grades[i] > highestGrade) {
-                                highestGrade = grades[i];
-                                topStudentName = fullNames[i];
-                            }
-                        }
-
-                        double average = total / studentCount;
-                        System.out.printf("Average Grade  : %.2f\n", average);
-                        System.out.printf("Top Student    : %s (Grade: %.1f)\n", topStudentName, highestGrade);
-                    } else {
-                        System.out.println("Average Grade  : N/A (No records)");
-                        System.out.println("Top Student    : N/A (No records)");
-                    }
-                    System.out.println();
-                    break;
-
-                case 5: // --- EXIT PROGRAM ---
-                    System.out.println("Thank you for using the Student Information System. Goodbye!");
-                    exit = true;
-                    break;
-
-                default:
-                    System.out.println("[Error] Invalid choice. Please select an option from 1 to 5.\n");
+                System.out.println("Please enter the correct format (e.g., numbers for Year).");
+                input.nextLine();
             }
         }
-        scanner.close();
+
+        System.out.println("Goodbye!");
+        input.close();
     }
 }
