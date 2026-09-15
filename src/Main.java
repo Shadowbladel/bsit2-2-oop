@@ -1,208 +1,140 @@
 import java.util.Scanner;
 
 public class Main {
+
+    private static Scanner input = new Scanner(System.in);
+    private static PaymentGateway gateway = new PaymentGateway();
+    private static int nextId = 1001;
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        int maxStudents = 10;
+        System.out.println("========================================");
+        System.out.println("   LICEO PAY - Payment Gateway (CLI)");
+        System.out.println("========================================");
+        seedSamplePayments();
 
-        int[] studentIds = new int[maxStudents];
-        String[] fullNames = new String[maxStudents];
-        int[] ages = new int[maxStudents];
-        String[] courses = new String[maxStudents];
-        double[] grades = new double[maxStudents];
-        boolean[] enrolledStatuses = new boolean[maxStudents];
+        boolean running = true;
+        while (running) {
+            showMenu();
+            String choice = input.nextLine().trim();
 
-        int studentCount = 0;
-        boolean exit = false;
-
-        // --- MAIN PROGRAM LOOP ---
-        while (!exit) {
-            System.out.println("========================================");
-            System.out.println("       STUDENT INFORMATION SYSTEM       ");
-            System.out.println("========================================");
-            System.out.println("[1] Add Student");
-            System.out.println("[2] View All Students");
-            System.out.println("[3] Search Student by ID");
-            System.out.println("[4] View Statistics");
-            System.out.println("[5] Exit");
-            System.out.print("Enter choice: ");
-
-            // Validate menu selection input
-            if (!scanner.hasNextInt()) {
-                System.out.println("\n[Error] Invalid input. Please enter a number.\n");
-                scanner.nextLine();
-                continue;
-            }
-
-            int choice = scanner.nextInt();
-            scanner.nextLine();
-            System.out.println();
-
-            switch (choice) {
-                case 1: // --- ADD STUDENT ---
-                    if (studentCount >= maxStudents) {
-                        System.out.println("[Error] Cannot add more students. Maximum capacity reached.\n");
-                        break;
-                    }
-
-                    System.out.println("--- ADD NEW STUDENT ---");
-
-                    // 1. Student ID Validation
-                    System.out.print("Enter Student ID: ");
-                    while (!scanner.hasNextInt()) {
-                        System.out.println("[Error] Invalid input. Please enter an integer.");
-                        System.out.print("Enter Student ID: ");
-                        scanner.next();
-                    }
-                    studentIds[studentCount] = scanner.nextInt();
-                    scanner.nextLine();
-
-                    // 2. Full Name Input
-                    System.out.print("Enter Full Name: ");
-                    fullNames[studentCount] = scanner.nextLine();
-
-                    // 3. Age Validation
-                    int age;
-                    do {
-                        System.out.print("Enter Age: ");
-                        while (!scanner.hasNextInt()) {
-                            System.out.println("[Error] Invalid input. Please enter an integer.");
-                            System.out.print("Enter Age: ");
-                            scanner.next();
-                        }
-                        age = scanner.nextInt();
-                        if (age <= 0) {
-                            System.out.println("[Error] Invalid age. Must be a positive number.");
-                        }
-                    } while (age <= 0);
-                    ages[studentCount] = age;
-                    scanner.nextLine();
-
-                    // 4. Course Input
-                    System.out.print("Enter Course: ");
-                    courses[studentCount] = scanner.nextLine();
-
-                    // 5. Grade Validation
-                    double grade;
-                    do {
-                        System.out.print("Enter Grade (0-100): ");
-                        while (!scanner.hasNextDouble()) {
-                            System.out.println("[Error] Invalid input. Please enter a number.");
-                            System.out.print("Enter Grade (0-100): ");
-                            scanner.next();
-                        }
-                        grade = scanner.nextDouble();
-                        if (grade < 0 || grade > 100) {
-                            System.out.println("[Error] Invalid grade. Must be between 0 and 100.");
-                        }
-                    } while (grade < 0 || grade > 100);
-                    grades[studentCount] = grade;
-
-                    // 6. Enrollment Status Validation
-                    System.out.print("Is Enrolled? (true/false): ");
-                    while (!scanner.hasNextBoolean()) {
-                        System.out.println("Invalid input. Please enter 'true' or 'false'.");
-                        System.out.print("Is Enrolled? (true/false): ");
-                        scanner.next();
-                    }
-                    enrolledStatuses[studentCount] = scanner.nextBoolean();
-
-                    System.out.println("\n>> Student added successfully!\n");
-                    studentCount++;
-                    break;
-
-                case 2: // --- VIEW ALL STUDENTS ---
-                    System.out.println("-------------------------------- STUDENT RECORDS --------------------------------");
-                    if (studentCount == 0) {
-                        System.out.println("No student records found.");
-                    } else {
-                        System.out.printf("%-6s %-18s %-5s %-10s %-8s %-15s\n",
-                                "ID", "NAME", "AGE", "COURSE", "GRADE", "STANDING");
-                        System.out.println("---------------------------------------------------------------------------------");
-
-                        for (int i = 0; i < studentCount; i++) {
-                            String standing;
-                            if (grades[i] >= 90) {
-                                standing = "Dean's Lister";
-                            } else if (grades[i] >= 75) {
-                                standing = "Passed";
-                            } else {
-                                standing = "Failed";
-                            }
-
-                            System.out.printf("%-6d %-18s %-5d %-10s %-8.1f %-15s\n",
-                                    studentIds[i], fullNames[i], ages[i], courses[i], grades[i], standing);
-                        }
-                    }
-                    System.out.println();
-                    break;
-
-                case 3: // --- SEARCH STUDENT BY ID ---
-                    System.out.print("Enter Student ID to search: ");
-                    while (!scanner.hasNextInt()) {
-                        System.out.println("Invalid input. Please enter an integer.");
-                        System.out.print("Enter Student ID to search: ");
-                        scanner.next();
-                    }
-                    int searchId = scanner.nextInt();
-                    boolean found = false;
-
-                    for (int i = 0; i < studentCount; i++) {
-                        if (studentIds[i] == searchId) {
-                            System.out.println("\n--- STUDENT FOUND ---");
-                            System.out.println("ID Number : " + studentIds[i]);
-                            System.out.println("Name      : " + fullNames[i]);
-                            System.out.println("Age       : " + ages[i]);
-                            System.out.println("Course    : " + courses[i]);
-                            System.out.println("Grade     : " + grades[i]);
-                            System.out.println("Enrolled  : " + (enrolledStatuses[i] ? "Yes" : "No"));
-                            found = true;
-                            break;
-                        }
-                    }
-
-                    if (!found) {
-                        System.out.println("\n[Notice] Student with ID " + searchId + " was not found.");
-                    }
-                    System.out.println();
-                    break;
-
-                case 4: // --- VIEW STATISTICS ---
-                    System.out.println("--- PROGRAM STATISTICS ---");
-                    System.out.println("Total Students : " + studentCount);
-
-                    if (studentCount > 0) {
-                        double total = 0;
-                        double highestGrade = -1;
-                        String topStudentName = "";
-
-                        for (int i = 0; i < studentCount; i++) {
-                            total += grades[i];
-                            if (grades[i] > highestGrade) {
-                                highestGrade = grades[i];
-                                topStudentName = fullNames[i];
-                            }
-                        }
-
-                        double average = total / studentCount;
-                        System.out.printf("Average Grade  : %.2f\n", average);
-                        System.out.printf("Top Student    : %s (Grade: %.1f)\n", topStudentName, highestGrade);
-                    } else {
-                        System.out.println("Average Grade  : N/A (No records)");
-                        System.out.println("Top Student    : N/A (No records)");
-                    }
-                    System.out.println();
-                    break;
-
-                case 5: // --- EXIT PROGRAM ---
-                    System.out.println("Thank you for using the Student Information System. Goodbye!");
-                    exit = true;
-                    break;
-
-                default:
-                    System.out.println("[Error] Invalid choice. Please select an option from 1 to 5.\n");
+            if (choice.equals("1")) {
+                makePayment();
+            } else if (choice.equals("2")) {
+                System.out.println();
+                gateway.processAll();
+            } else if (choice.equals("3")) {
+                findPayment();
+            } else if (choice.equals("4")) {
+                System.out.printf("%nPayments recorded: %d%n", gateway.count());
+                System.out.printf("Total collected  : PHP %.2f%n", gateway.totalCollected());
+            } else if (choice.equals("5")) {
+                System.out.println();
+                System.out.println("Refunding every payment that can be refunded:");
+                gateway.refundAll();
+            } else if (choice.equals("6")) {
+                System.out.println();
+                System.out.println("Service fees (the two serviceFee methods):");
+                gateway.showServiceFees();
+            } else if (choice.equals("0")) {
+                running = false;
+                System.out.println();
+                System.out.println("Salamat! Goodbye.");
+            } else {
+                System.out.println("Unknown choice. Please pick 0 to 6.");
             }
         }
-        scanner.close();
+    }
+
+    private static void showMenu() {
+        System.out.println();
+        System.out.println("----------------------------------------");
+        System.out.println(" 1. Make a payment");
+        System.out.println(" 2. Show all receipts");
+        System.out.println(" 3. Find a payment by ID");
+        System.out.println(" 4. Show total collected");
+        System.out.println(" 5. Refund the refundable payments");
+        System.out.println(" 6. Compare service fees");
+        System.out.println(" 0. Exit");
+        System.out.println("----------------------------------------");
+        System.out.print("Choice: ");
+    }
+
+    private static void makePayment() {
+        System.out.println();
+        System.out.println("Payment method:  1 = GCash   2 = Maya   3 = Cash");
+        System.out.print("Method: ");
+        String method = input.nextLine().trim();
+
+        System.out.print("Payer name: ");
+        String name = input.nextLine().trim();
+
+        System.out.print("Amount: ");
+        double amount = readDouble();
+
+        Payment payment;
+
+        if (method.equals("1")) {
+            System.out.print("Mobile number: ");
+            String mobile = input.nextLine().trim();
+            payment = new GCashPayment(nextId, name, amount, mobile);
+        } else if (method.equals("2")) {
+            System.out.print("Email address: ");
+            String email = input.nextLine().trim();
+            payment = new MayaPayment(nextId, name, amount, email);
+        } else if (method.equals("3")) {
+            payment = new CashPayment(nextId, name, amount);
+        } else {
+            System.out.println("Unknown method. The payment was not recorded.");
+            return;
+        }
+
+        gateway.add(payment);
+        nextId++;
+        System.out.println();
+        System.out.println("Recorded:");
+        payment.printReceipt();
+    }
+
+    private static void findPayment() {
+        System.out.print("Enter payment ID: ");
+        int id = readInt();
+        Payment found = gateway.findById(id);
+        if (found == null) {
+            System.out.println("No payment found with ID " + id + ".");
+        } else {
+            System.out.println("Found:");
+            found.printReceipt();
+        }
+    }
+
+    private static int readInt() {
+        while (true) {
+            String line = input.nextLine().trim();
+            try {
+                return Integer.parseInt(line);
+            } catch (NumberFormatException e) {
+                System.out.print("That is not a whole number. Try again: ");
+            }
+        }
+    }
+
+    private static double readDouble() {
+        while (true) {
+            String line = input.nextLine().trim();
+            try {
+                return Double.parseDouble(line);
+            } catch (NumberFormatException e) {
+                System.out.print("That is not an amount. Try again: ");
+            }
+        }
+    }
+
+    private static void seedSamplePayments() {
+        gateway.add(new GCashPayment(nextId, "Ana", 1500.00, "0917-555-0134"));
+        nextId++;
+        gateway.add(new MayaPayment(nextId, "Jerome", 899.50, "jerome@liceo.edu.ph"));
+        nextId++;
+        gateway.add(new CashPayment(nextId, "Liza", 250.00));
+        nextId++;
     }
 }
